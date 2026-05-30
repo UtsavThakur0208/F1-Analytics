@@ -132,6 +132,6 @@ Formula1-Performance-Analytics/
 
 **Utsav Thakur**
 
-B.Sc. Computer Science (Data Science)
+## Note
 
-Passionate about Data Analytics, Machine Learning, and Sports Analytics.
+**If GitHub fails to render certain notebooks, download the notebook or open it in Google Colab/Jupyter Notebook for the best viewing experience.**
