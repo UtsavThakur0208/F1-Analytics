@@ -144,6 +144,7 @@ with kpi4:
         .sum()
         .idxmax()
     )
+    top_driver = wins.idxmax() if not wins.empty else "N/A"
     st.metric(label="🏆 Most Wins", value=top_driver)
 
 st.markdown("---")
