@@ -96,12 +96,10 @@ def load_data():
     )
 
     return master, driver_stats, constructor_stats, pit_agg, pit_stops
-    
-    return master, driver_stats, constr_stats, pit_agg, pit_stops
 
 # Load data (cached after first run)
 master, driver_stats, constructor_stats, pit_agg, pit_stops = load_data()
-master['position'] = (master['position'] == 1).astype(int)
+master['is_winner'] = (master['position'] == 1).astype(int)
 
 # ── HEADER ────────────────────────────────────────────────────
 
