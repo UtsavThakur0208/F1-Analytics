@@ -66,20 +66,36 @@ def load_data():
     # relative to the repo root, NOT relative to this file.
     # We use try/except to handle both local and deployed paths.
     
-    try:
-        # Try local development path first
-        master       = pd.read_csv("D:\F1 Project\Progress\Processed\master_df.csv")
-        driver_stats = pd.read_csv("D:\F1 Project\Progress\Processed\driver_season_stats.csv")
-        constr_stats = pd.read_csv("D:\F1 Project\Progress\Processed\constructor_season_stats.csv")
-        pit_agg      = pd.read_csv("D:\F1 Project\Progress\Processed\pit_agg.csv")
-        pit_stops    = pd.read_csv("D:\F1 Project\Progress\Processed\pit_stops_clean.csv")
-    except FileNotFoundError:
-        # Fallback for when app.py is run from within the app/ folder
-        master       = pd.read_csv("D:\F1 Project\Progress\Processed\master_df.csv")
-        driver_stats = pd.read_csv("D:\F1 Project\Progress\Processed\driver_season_stats.csv")
-        constr_stats = pd.read_csv("D:\F1 Project\Progress\Processed\constructor_season_stats.csv")
-        pit_agg      = pd.read_csv("D:\F1 Project\Progress\Processed\pit_agg.csv")
-        pit_stops    = pd.read_csv("D:\F1 Project\Progress\Processed\pit_stops_clean.csv")
+  import os
+
+@st.cache_data
+def load_data():
+
+    BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+    DATA_DIR = os.path.join(BASE_DIR, "Data", "Processed")
+
+    master = pd.read_csv(
+        os.path.join(DATA_DIR, "processedmaster_df.csv")
+    )
+
+    driver_stats = pd.read_csv(
+        os.path.join(DATA_DIR, "processeddriver_season_stats.csv")
+    )
+
+    constructor_stats = pd.read_csv(
+        os.path.join(DATA_DIR, "processedconstructor_season_stats.csv")
+    )
+
+    pit_agg = pd.read_csv(
+        os.path.join(DATA_DIR, "processedpit_agg.csv")
+    )
+
+    pit_stops = pd.read_csv(
+        os.path.join(DATA_DIR, "processedpit_stops_clean.csv")
+    )
+
+    return master, driver_stats, constructor_stats, pit_agg, pit_stops
     
     return master, driver_stats, constr_stats, pit_agg, pit_stops
 
