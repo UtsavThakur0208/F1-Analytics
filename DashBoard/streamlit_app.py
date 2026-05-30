@@ -242,7 +242,7 @@ with tab1:
         top_n = st.slider("Show top N drivers", 5, 20, 10, key="winner_slider")
         
         wins_data = (
-            filtered[filtered['position'] == 1]
+            filtered[filtered['is_winner'] == 1]
             .groupby('driver_name')['position']
             .sum()
             .sort_values(ascending=True)
@@ -308,7 +308,7 @@ with tab1:
     
     # Smart default: automatically pick top 5 by wins
     top5_default = (
-        filtered[filtered['position'] == 1]
+        filtered[filtered['is_winner'] == 1]
         .groupby('driver_name')['position']
         .sum()
         .nlargest(5)
