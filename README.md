@@ -58,7 +58,10 @@ The project uses historical Formula 1 datasets containing:
 ## 📁 Project Structure
 
 ```text
+
 Formula1-Performance-Analytics/
+├── dashboard/
+│   └── app.py
 │
 ├── data/
 │   ├── raw/
@@ -70,8 +73,6 @@ Formula1-Performance-Analytics/
 │   ├── 03_Constructor_Analysis.ipynb
 │   └── 04_eda_constructors.ipynb
 │   └── 05_pit_stop_analysis.ipynb
-├── dashboard/
-│   └── app.py
 │
 ├── images/
 │
