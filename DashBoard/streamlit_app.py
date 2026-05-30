@@ -75,7 +75,7 @@ st.markdown("---")
 with st.sidebar:
     logo_path = os.path.join(BASE_DIR, "Images", "f1_logo.png")
 
-     st.image(logo_path, width=150)
+     st.image(Images/Download.png, width=150)
     st.header("🔧 Filters")
 
     year_min = int(master['year'].min())
