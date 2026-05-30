@@ -1,0 +1,16 @@
+# ============================================================
+# Development Only — Do NOT include in Streamlit Cloud deploy
+# ============================================================
+
+# ── Notebook Environment ─────────────────────────────────────
+jupyter==1.0.0                  # Notebook interface
+notebook==7.2.0                 # Classic notebook server
+ipykernel==6.29.4               # Jupyter kernel for VS Code
+
+# ── Code Quality ─────────────────────────────────────────────
+black==24.4.2                   # Auto code formatter
+flake8==7.0.0                   # Linting / style checker
+isort==5.13.2                   # Auto-sort imports
+
+# ── Testing ──────────────────────────────────────────────────
+pytest==8.2.0                   # Unit testing framework
