@@ -58,13 +58,6 @@ st.markdown("""
 # the result. If inputs don't change, reuse cached result."
 # Without caching, CSVs would reload on every single interaction,
 # making the app feel slow and sluggish.
-
-@st.cache_data
-def load_data():
-    """Load all processed CSV files."""
-    # IMPORTANT: When deployed on Streamlit Cloud, paths must be
-    # relative to the repo root, NOT relative to this file.
-    # We use try/except to handle both local and deployed paths.
     
   import os
 
@@ -275,7 +268,7 @@ with tab1:
             filtered.groupby('driver_name')
             .agg(
                 races  = ('resultId', 'count'),
-                podiums = ('position', 'sum')
+                podiums=('position', lambda x: (x <= 3).sum())
             )
             .reset_index()
         )
@@ -358,8 +351,8 @@ with tab2:
         st.subheader("🏆 Constructor Wins")
         
         constr_wins = (
-            filtered[filtered['position'] == 1]
-            .groupby('constructor_name')['position']
+            filtered[filtered['is_winner'] == 1]
+            .groupby('constructor_name')['is_winner']
             .sum()
             .sort_values(ascending=True)
             .tail(12)
@@ -458,7 +451,7 @@ with tab3:
         pg_data = (
             filtered.groupby('driver_name')
             .agg(
-                avg_gained = ('position', 'mean'),
+                avg_gained=('positions_gained', 'mean'),
                 races      = ('resultId', 'count')
             )
             .reset_index()
@@ -502,7 +495,7 @@ with tab3:
             'year':          'Year',
             'grid':          'Start',
             'positionOrder': 'Finish',
-            'position': '↑ Gained'
+            'position': 'positions_gained'
         })
         best_single['↑ Gained'] = best_single['↑ Gained'].astype(int)
         
