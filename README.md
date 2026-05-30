@@ -77,6 +77,8 @@ Formula1-Performance-Analytics/
 ├── images/
 │
 └── README.md
+│
+└── requirements.txt
 ```
 
 ---
