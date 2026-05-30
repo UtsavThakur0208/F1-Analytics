@@ -68,8 +68,8 @@ Formula1-Performance-Analytics/
 │   ├── 01_F1_Data_Cleaning_and_Preprocessing.ipynb
 │   ├── 02_Driver_Performance_Analysis.ipynb
 │   ├── 03_Constructor_Analysis.ipynb
-│   └── ...
-│
+│   └── 04_eda_constructors.ipynb
+│   └── 05_pit_stop_analysis.ipynb
 ├── dashboard/
 │   └── app.py
 │
