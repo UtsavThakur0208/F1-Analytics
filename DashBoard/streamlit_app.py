@@ -86,8 +86,7 @@ def load_data():
 # Load data (cached after first run)
 master, driver_stats, constructor_stats, pit_agg, pit_stops = load_data()
 master['position'] = (master['position'] == 1).astype(int)
-st.write(master.columns.tolist())
-st.write(master.columns.tolist())
+
 # ── HEADER ────────────────────────────────────────────────────
 
 st.markdown('<p class="main-header">🏎️ Formula 1 Analytics Dashboard</p>', 
