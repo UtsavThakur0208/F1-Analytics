@@ -73,10 +73,8 @@ st.markdown("---")
 # ── SIDEBAR FILTERS ───────────────────────────────────────────
 
 with st.sidebar:
-    st.image("https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/F1.svg/320px-F1.svg.png",
-             width=150)
-
-    st.header("🔧 Filters")
+    (st.image("Images/f1_logo.png", width=150)
+    -st.header("🔧 Filters")
 
     year_min = int(master['year'].min())
     year_max = int(master['year'].max())
