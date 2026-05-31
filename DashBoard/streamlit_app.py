@@ -74,7 +74,7 @@ st.markdown("---")
 
 with st.sidebar:
 
-    st.image("Images/download.png", width=150)
+    st.image("Images/download.jpg", width=150)
 
     st.header("🔧 Filters")
 
