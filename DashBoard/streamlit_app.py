@@ -561,8 +561,6 @@ with tab4:
 
 # ── FOOTER ────────────────────────────────────────────────────
 st.markdown("---")
-st.markdown(
-    "**Data Source:** [Ergast Motor Racing API](http://ergast.com/mrd/) | "
-    "**Built with:** Python, Streamlit, Plotly | "
-    "**GitHub:** [Your Repo Link]"
-)
+st.markdown("""
+Data Source: Ergast Motor Racing API | Built with: Python, Streamlit, Plotly | GitHub: [F1 Analytics Repo](https://github.com/UtsavThakur0208/F1-Analytics)
+""")
