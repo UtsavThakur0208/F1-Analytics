@@ -138,16 +138,17 @@ with kpi3:
 
 with kpi4:
     # Bug 2 fixed: use is_winner column, not position
-    top_driver = (
-        filtered[filtered['is_winner'] == 1]
-        .groupby('driver_name')['is_winner']
-        .sum()
-        .idxmax()
+    wins = (
+    filtered[filtered['is_winner'] == 1]
+    .groupby('driver_name')['is_winner']
+    .sum()
     )
+
     top_driver = wins.idxmax() if not wins.empty else "N/A"
+
     st.metric(label="🏆 Most Wins", value=top_driver)
 
-st.markdown("---")
+    st.markdown("---")
 
 
 # ── TABS ──────────────────────────────────────────────────────
