@@ -1,4 +1,7 @@
 # 🏎️ Formula 1 Performance Analytics Dashboard
+## Note
+
+**If GitHub fails to render certain notebooks, download the notebook or open it in Google Colab/Jupyter Notebook for the best viewing experience.**
 
 ## 📌 Project Overview
 
@@ -135,6 +138,3 @@ Formula1-Performance-Analytics/
 
 **Utsav Thakur**
 
-## Note
-
-**If GitHub fails to render certain notebooks, download the notebook or open it in Google Colab/Jupyter Notebook for the best viewing experience.**
