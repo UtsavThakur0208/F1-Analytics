@@ -8,6 +8,7 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import plotly.graph_objects as go
 import os  # ← Bug 1 fixed: import at top level
 
 # ── PAGE CONFIGURATION ────────────────────────────────────────
@@ -57,10 +58,14 @@ def load_data():
 
 
 master, driver_stats, constructor_stats, pit_agg, pit_stops = load_data()
+st.dataframe(pd.DataFrame(driver_stats.columns, columns=["Columns"]))
 
 # Create is_winner cleanly — does NOT overwrite any original column
 master['is_winner'] = (master['positionOrder'] == 1).astype(int)
-
+master['did_finish'] = (master['positionOrder'] > 0).astype(int)
+master['positions_gained'] = (
+    master['grid'] - master['positionOrder']
+)
 # ── HEADER ────────────────────────────────────────────────────
 
 st.markdown('<p class="main-header">🏎️ Formula 1 Analytics Dashboard</p>',
@@ -73,14 +78,15 @@ st.markdown("---")
 # ── SIDEBAR FILTERS ───────────────────────────────────────────
 
 with st.sidebar:
-     logo_path = os.path.join(BASE_DIR, "Images", "f1_logo.png")
-     st.image("Images/download.png", width=150)
-     st.header("🔧 Filters")
 
-    year_min = int(master['year'].min())
-    year_max = int(master['year'].max())
+   st.image(r"C:\Users\niran\F1-Analytics\Images\download.png", width=150)
 
-    year_range = st.slider(
+st.header("🔧 Filters")
+
+year_min = int(master['year'].min())
+year_max = int(master['year'].max())
+
+year_range = st.slider(
         "Select Year Range",
         min_value=year_min,
         max_value=year_max,
@@ -88,21 +94,22 @@ with st.sidebar:
         step=1
     )
 
-    st.markdown("---")
+st.markdown("---")
 
-    all_constructors = sorted(master['constructor_name'].dropna().unique().tolist())
-    default_teams    = ['Mercedes', 'Red Bull', 'Ferrari', 'McLaren']
-    valid_defaults   = [t for t in default_teams if t in all_constructors]
+all_constructors = sorted(master['constructor_name'].dropna().unique().tolist())
+default_teams    = ['Mercedes', 'Red Bull', 'Ferrari', 'McLaren']
+valid_defaults   = [t for t in default_teams if t in all_constructors]
 
-    selected_constructors = st.multiselect(
+selected_constructors = st.multiselect(
         "Select Constructors",
         options=all_constructors,
         default=valid_defaults
     )
 
-    st.markdown("---")
-    st.caption("📊 Data: Ergast F1 API Dataset")
-    st.caption("Built with Streamlit + Plotly")
+st.markdown("---")
+st.caption("📊 Data: Ergast F1 API Dataset")
+st.caption("Built with Streamlit + Plotly")
+
 
 
 # ── APPLY FILTERS ─────────────────────────────────────────────
@@ -136,26 +143,29 @@ with kpi3:
     st.metric(label="🏭 Constructors", value=f"{total_constructors:,}")
 
 with kpi4:
-    # Bug 2 fixed: use is_winner column, not position
-    top_driver = (
+    wins = (
         filtered[filtered['is_winner'] == 1]
         .groupby('driver_name')['is_winner']
         .sum()
-        .idxmax()
     )
-    top_driver = wins.idxmax() if not wins.empty else "N/A"
-    st.metric(label="🏆 Most Wins", value=top_driver)
 
+    top_driver = wins.idxmax() if not wins.empty else "N/A"
+
+    st.metric(
+        label="🏆 Most Wins",
+        value=top_driver
+    )
 st.markdown("---")
 
 
 # ── TABS ──────────────────────────────────────────────────────
 
-tab1, tab2, tab3, tab4 = st.tabs([
+tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "🧑‍💼 Driver Analysis",
     "🏭 Constructor Analysis",
     "🔄 Positions Gained",
-    "⏱️ Pit Stop Analysis"
+    "⏱️ Pit Stop Analysis",
+    "⚔️ Driver Comparison"
 ])
 
 
@@ -557,10 +567,310 @@ with tab4:
     fig_box.update_layout(plot_bgcolor='white', height=400)
     st.plotly_chart(fig_box, use_container_width=True)
 
+# ==========================================================
+# TAB 5: DRIVER COMPARISON
+# ==========================================================
+
+with tab5:
+
+    st.header("⚔️ Driver Comparison")
+
+    # Aggregate stats across all seasons
+    agg = (
+        driver_stats.groupby("driver_name")
+        .agg(
+            Wins=("total_wins", "sum"),
+            Podiums=("total_podiums", "sum"),
+            Points=("total_points", "sum"),
+            Avg_Finish=("avg_position", "mean"),
+            DNFs=("total_dnf", "sum"),
+            Races=("races_entered", "sum")
+        )
+        .reset_index()
+    )
+    # Rates
+    agg["Win_Rate"] = agg["Wins"] / agg["Races"]
+    agg["Podium_Rate"] = agg["Podiums"] / agg["Races"]
+    agg["Points_Per_Race"] = agg["Points"] / agg["Races"]
+    agg["DNF_Rate"] = agg["DNFs"] / agg["Races"]
+
+    # Driver Performance Index
+    agg["DPI"] = (
+    0.35 * agg["Win_Rate"] * 100
+    + 0.30 * agg["Podium_Rate"] * 100
+    + 0.20 * agg["Points_Per_Race"]
+    - 0.10 * agg["DNF_Rate"] * 100
+    + 0.05 * np.log1p(agg["Races"])
+    )
+
+    agg["DPI"] = agg["DPI"].round(2)
+
+    agg["DPI"] = agg["DPI"].round(2)
+
+    drivers = sorted(agg["driver_name"].unique())
+
+    # Driver selectors
+    col1, col2 = st.columns(2)
+
+    with col1:
+        driver1 = st.selectbox(
+            "Select Driver 1",
+            drivers,
+            key="driver1"
+        )
+
+    with col2:
+        driver2 = st.selectbox(
+            "Select Driver 2",
+            drivers,
+            index=1,
+            key="driver2"
+        )
+
+    # Prevent same driver selection
+    if driver1 == driver2:
+        st.error(
+            "🚫 You selected the same driver twice.\n\n"
+            "Please choose two different drivers."
+        )
+        st.stop()
+
+    # Get stats for selected drivers
+    d1 = agg[agg["driver_name"] == driver1].iloc[0]
+    d2 = agg[agg["driver_name"] == driver2].iloc[0]
+    # Driver Performance Index (DPI)
+    agg["DPI"] = (
+    0.4 * (agg["Wins"] / agg["Races"]) * 100
+    + 0.3 * (agg["Podiums"] / agg["Races"]) * 100
+    + 0.2 * (agg["Points"] / agg["Races"])
+    - 0.1 * (agg["DNFs"] / agg["Races"]) * 100
+    )
+
+    d1 = agg[agg["driver_name"] == driver1].iloc[0]
+    d2 = agg[agg["driver_name"] == driver2].iloc[0]
+
+    st.subheader(f"🏁 {driver1} vs {driver2}")
+
+    # Metric cards
+    c1, c2, c3, c4, c5, c6 = st.columns(6)
+
+    with c1:
+        st.metric(
+            "🏆 Wins",
+            int(d1["Wins"]),
+            delta=int(d1["Wins"] - d2["Wins"])
+        )
+
+    with c2:
+        st.metric(
+            "🥇 Podiums",
+            int(d1["Podiums"]),
+            delta=int(d1["Podiums"] - d2["Podiums"])
+        )
+
+    with c3:
+        st.metric(
+            "⚡ Points",
+            int(d1["Points"]),
+            delta=int(d1["Points"] - d2["Points"])
+        )
+
+    with c4:
+        st.metric(
+            "💥 DNFs",
+            int(d1["DNFs"]),
+            delta=int(d2["DNFs"] - d1["DNFs"])
+        )
+
+    with c5:
+        st.metric(
+            "📍 Avg Finish",
+            round(d1["Avg_Finish"], 2),
+            delta=round(d2["Avg_Finish"] - d1["Avg_Finish"], 2)
+        )
+    with c6:
+        st.metric(
+        "⭐ DPI",
+        round(d1["DPI"],2),
+        delta=round(d1["DPI"]-d2["DPI"],2)
+        )
+    st.markdown("## 📡 Radar Chart")
+
+    categories = [
+    "Wins",
+    "Podiums",
+    "Points",
+    "Avg Finish",
+    "DPI"
+    ]
+
+   # Normalize values
+    max_wins = agg["Wins"].max()
+    max_podiums = agg["Podiums"].max()
+    max_points = agg["Points"].max()
+    max_dpi = agg["DPI"].max()
+
+    driver1_values = [
+    d1["Wins"]/max_wins,
+    d1["Podiums"]/max_podiums,
+    d1["Points"]/max_points,
+    1 - d1["Avg_Finish"]/agg["Avg_Finish"].max(),
+    d1["DPI"]/max_dpi
+    ]
+
+    driver2_values = [
+    d2["Wins"]/max_wins,
+    d2["Podiums"]/max_podiums,
+    d2["Points"]/max_points,
+    1 - d2["Avg_Finish"]/agg["Avg_Finish"].max(),
+    d2["DPI"]/max_dpi
+    ]
+
+    fig = go.Figure()
+
+    fig.add_trace(go.Scatterpolar(
+    r=driver1_values,
+    theta=categories,
+    fill='toself',
+    name=driver1
+    ))
+
+    fig.add_trace(go.Scatterpolar(
+    r=driver2_values,
+    theta=categories,
+    fill='toself',
+    name=driver2
+    ))
+
+    fig.update_layout(
+    polar=dict(
+        radialaxis=dict(
+            visible=True,
+            range=[0,1]
+        )
+    ),
+    showlegend=True,
+    height=600
+    )
+
+    st.plotly_chart(fig, use_container_width=True)
+
+    st.markdown("## 🏆 Driver Performance Index Rankings")
+
+    top_dpi = (
+    agg.sort_values("DPI", ascending=False)
+       .head(10)
+    )
+
+    fig_dpi = px.bar(
+    top_dpi,
+    x="DPI",
+    y="driver_name",
+    orientation="h",
+    color="DPI",
+    title="🏆 Top 10 Drivers by Driver Performance Index"
+    )
+
+    fig_dpi.update_layout(
+    yaxis=dict(categoryorder="total ascending"),
+    height=600
+    )
+
+    st.plotly_chart(fig_dpi, use_container_width=True)
+    
+    # Head-to-head table
+    
+    comparison_df = pd.DataFrame({
+        "Metric": ["Races", "Wins", "Podiums", "Points", "DNFs", "Avg Finish"],
+        driver1: [
+            int(d1["Races"]),
+            int(d1["Wins"]),
+            int(d1["Podiums"]),
+            int(d1["Points"]),
+            int(d1["DNFs"]),
+            round(d1["Avg_Finish"], 2)
+            ],
+            driver2: [
+            int(d2["Races"]),
+            int(d2["Wins"]),
+            int(d2["Podiums"]),
+            int(d2["Points"]),
+            int(d2["DNFs"]),
+            round(d2["Avg_Finish"], 2)
+            ]
+        })
+    comparison_df = pd.DataFrame({
+    "Metric": ["Races", "Wins", "Podiums", "Points", "DNFs", "Avg Finish"],
+    driver1: [
+        int(d1["Races"]),
+        int(d1["Wins"]),
+        int(d1["Podiums"]),
+        int(d1["Points"]),
+        int(d1["DNFs"]),
+        round(d1["Avg_Finish"], 2)
+    ],
+    driver2: [
+        int(d2["Races"]),
+        int(d2["Wins"]),
+        int(d2["Podiums"]),
+        int(d2["Points"]),
+        int(d2["DNFs"]),
+        round(d2["Avg_Finish"], 2)
+    ]
+})
+    comparison_df = pd.DataFrame({
+    "Metric": [
+        "Races",
+        "Wins",
+        "Podiums",
+        "Points",
+        "DNFs",
+        "Avg Finish"
+    ],
+
+    driver1: [
+        int(d1["Races"]),
+        int(d1["Wins"]),
+        int(d1["Podiums"]),
+        int(d1["Points"]),
+        int(d1["DNFs"]),
+        round(d1["Avg_Finish"], 2)
+    ],
+
+    driver2: [
+        int(d2["Races"]),
+        int(d2["Wins"]),
+        int(d2["Podiums"]),
+        int(d2["Points"]),
+        int(d2["DNFs"]),
+        round(d2["Avg_Finish"], 2)
+    ]
+})
+# ==========================
+# DISPLAY TABLE
+# ==========================
+    st.markdown("### 📊 Head-to-Head Comparison")
+    fig_dpi = px.bar(
+    top_dpi,
+    x="DPI",
+    y="driver_name",
+    orientation="h",
+    color="DPI",
+    title="🏆 Top 10 Drivers by Driver Performance Index"
+    )
+
+    fig_dpi.update_layout(
+    yaxis=dict(categoryorder="total ascending"),
+    height=600
+    )
+    st.dataframe(comparison_df)
+    st.write(comparison_df)
+
+    
 # ── FOOTER ────────────────────────────────────────────────────
-st.markdown("---")
-st.markdown(
+    st.markdown("---")
+    st.markdown(
     "**Data Source:** [Ergast Motor Racing API](http://ergast.com/mrd/) | "
     "**Built with:** Python, Streamlit, Plotly | "
     "**GitHub:** [Your Repo Link]"
-)
+    )
