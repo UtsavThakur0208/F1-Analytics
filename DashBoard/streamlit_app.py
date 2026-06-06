@@ -9,8 +9,12 @@ import plotly.express as px
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import plotly.graph_objects as go
-import os  # ← Bug 1 fixed: import at top level
-
+import os 
+BASE_DIR = os.path.dirname(
+    os.path.dirname(
+        os.path.abspath(__file__)
+    )
+)
 # ── PAGE CONFIGURATION ────────────────────────────────────────
 
 st.set_page_config(
@@ -79,11 +83,12 @@ st.markdown("---")
 
 with st.sidebar:
 
-    st.image("Images/download.png", width=150)
+   logo_path = os.path.join(BASE_DIR, "Images", "download.png")
+   st.image(logo_path, width=150)
 
-    st.header("🔧 Filters")
+   st.header("🔧 Filters")
 
-    st.image(r"C:\Users\niran\F1-Analytics\Images\download.png", width=150)
+   st.image(r"C:\Users\niran\F1-Analytics\Images\download.png", width=150)
 
 st.header("🔧 Filters")
 
@@ -159,7 +164,7 @@ with kpi4:
         label="🏆 Most Wins",
         value=top_driver
     )
-st.markdown("---")
+    st.markdown("---")
     # Bug 2 fixed: use is_winner column, not position
     wins = (
     filtered[filtered['is_winner'] == 1]
