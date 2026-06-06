@@ -79,6 +79,10 @@ st.markdown("---")
 
 with st.sidebar:
 
+    st.image("Images/download.png", width=150)
+
+    st.header("🔧 Filters")
+
    st.image(r"C:\Users\niran\F1-Analytics\Images\download.png", width=150)
 
 st.header("🔧 Filters")
@@ -156,6 +160,18 @@ with kpi4:
         value=top_driver
     )
 st.markdown("---")
+    # Bug 2 fixed: use is_winner column, not position
+    wins = (
+    filtered[filtered['is_winner'] == 1]
+    .groupby('driver_name')['is_winner']
+    .sum()
+    )
+
+    top_driver = wins.idxmax() if not wins.empty else "N/A"
+
+    st.metric(label="🏆 Most Wins", value=top_driver)
+
+    st.markdown("---")
 
 
 # ── TABS ──────────────────────────────────────────────────────
@@ -874,3 +890,7 @@ with tab5:
     "**Built with:** Python, Streamlit, Plotly | "
     "**GitHub:** [Your Repo Link]"
     )
+st.markdown("---")
+st.markdown("""
+Data Source: Ergast Motor Racing API | Built with: Python, Streamlit, Plotly | GitHub: [F1 Analytics Repo](https://github.com/UtsavThakur0208/F1-Analytics)
+""")
