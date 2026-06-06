@@ -87,9 +87,9 @@ with st.sidebar:
     BASE_DIR,
     "Images",
     "download.png"
-)
+    )
 
-st.image(logo_path, width=150)
+   st.image(logo_path, width=150)
 
    st.header("🔧 Filters")
 
