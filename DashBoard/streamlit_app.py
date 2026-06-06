@@ -83,7 +83,7 @@ with st.sidebar:
 
     st.header("🔧 Filters")
 
-   st.image(r"C:\Users\niran\F1-Analytics\Images\download.png", width=150)
+    st.image(r"C:\Users\niran\F1-Analytics\Images\download.png", width=150)
 
 st.header("🔧 Filters")
 
