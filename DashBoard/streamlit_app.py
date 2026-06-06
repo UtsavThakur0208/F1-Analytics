@@ -83,8 +83,13 @@ st.markdown("---")
 
 with st.sidebar:
 
-   logo_path = os.path.join(BASE_DIR, "Images/download.png")
-   st.image(logo_path, width=150)
+  logo_path = os.path.join(
+    BASE_DIR,
+    "Images",
+    "download.png"
+)
+
+st.image(logo_path, width=150)
 
    st.header("🔧 Filters")
 
