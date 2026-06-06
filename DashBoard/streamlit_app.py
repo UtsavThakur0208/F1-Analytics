@@ -83,31 +83,26 @@ st.markdown("---")
 
 with st.sidebar:
 
-  logo_path = os.path.join(
-    BASE_DIR,
-    "Images",
-    "download.png"
+    logo_path = os.path.join(
+        BASE_DIR,
+        "Images",
+        "download.png"
     )
 
-   st.image(logo_path, width=150)
+    st.image(logo_path, width=150)
 
-   st.header("🔧 Filters")
+    st.header("🔧 Filters")
 
-   st.image(r"C:\Users\niran\F1-Analytics\Images\download.png", width=150)
+    year_min = int(master['year'].min())
+    year_max = int(master['year'].max())
 
-st.header("🔧 Filters")
-
-year_min = int(master['year'].min())
-year_max = int(master['year'].max())
-
-year_range = st.slider(
+    year_range = st.slider(
         "Select Year Range",
         min_value=year_min,
         max_value=year_max,
         value=(2010, year_max),
         step=1
     )
-
 st.markdown("---")
 
 all_constructors = sorted(master['constructor_name'].dropna().unique().tolist())
